@@ -1,0 +1,53 @@
+<!DOCTYPE html>
+<head>
+  <title>{{ .title }}</title>
+  <link
+    rel="shortcut icon"
+  />
+  <link rel="stylesheet" href="/sta/main.css" type="text/css"/>
+  <script>
+    window.onload = function() {
+      var submit = document.getElementById('submit')
+      var text = document.getElementById('text_field')
+      var img_display = document.getElementById('img_display')
+      var err_display = document.getElementById('err_display')
+      submit.onclick = function() {
+        var xhttp = new XMLHttpRequest()
+        xhttp.onload = function() {
+          console.log(xhttp.responseText)
+          var jsonRes = JSON.parse(xhttp.responseText)
+          if (xhttp.readyState == 4 && xhttp.status == 200) {
+            img_display.src = jsonRes.data
+            err_display.innerHTML = "" 
+            submit.disabled = false
+          } else if (xhttp.status != 200) {
+            err_display.innerHTML = jsonRes.error
+            img_display.src = "" 
+          }
+        }
+        xhttp.open("POST", "/generate", true)
+        xhttp.setRequestHeader("Content-type", "application/json;charset=UTF-8");
+        var data = JSON.stringify(
+          {
+            "prompt": text.value
+          }
+        )
+        console.log(data)
+        xhttp.send(data)
+        img_display.src = "/sta/loading_icon.gif"
+        submit.disabled = true
+      }
+
+    }
+  </script>
+</head>
+
+<body>
+  <h3 id="err_display"></h3>
+  <h3>{{ .title }}</h3>
+  <div class="sam">
+    <input type="text" id="text_field" name="prompt" placeholder="Enter text" required />
+    <input type="submit" id="submit" value="Generate Image"/>
+  </div>
+  <img id="img_display" src="" filename="result image">
+</body>
